@@ -1,0 +1,14 @@
+.form--person {
+    padding: 16px;
+    display: grid;
+    gap: 16px;
+    color: blue;
+
+    div {
+        display: grid;
+        gap: 8px;
+    }
+    label {
+        font-weight: 600;
+    }
+}

@@ -1,0 +1,14 @@
+.notification {
+    width: fit-content;
+    padding: 6px 16px;
+    border: 1px solid;
+
+    &.default {
+        color: blue;
+        border-color: blue;
+    }
+    &.alert {
+        color: red;
+        border-color: red;
+    }
+}

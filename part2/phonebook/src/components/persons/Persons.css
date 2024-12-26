@@ -1,0 +1,26 @@
+.list {
+    display: grid;
+    gap: 12px;
+}
+.card {
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 255, 0.23);
+    padding: 8px;
+    border-radius: 8px;
+
+    p {
+        margin-bottom: 8px;
+    }
+
+    .btn--destructive {
+        margin-left: auto;
+    }
+}
+
+@media screen and (min-width: 720px) {
+    .card {
+        width: 33%;
+    }
+}

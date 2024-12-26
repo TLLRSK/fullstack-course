@@ -1,0 +1,65 @@
+header,
+form {
+    padding: 8px 16px;
+}
+label {
+    text-transform: uppercase;
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    background-color: blue;
+    color: white;
+}
+.section {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.aside {
+    border-top: 1px solid blue;
+    grid-column: span 4;
+}
+
+.article {
+    grid-column: span 8;
+    padding: 16px;
+    overflow-y: scroll;
+}
+
+button {
+    cursor: pointer;
+    padding: 4px 16px;
+    border-radius: 16px;
+    text-transform: uppercase;
+}
+
+.btn--primary {
+    background-color: blue;
+    color: white;
+}
+
+.btn--destructive {
+    border: none;
+    font-size: 12px;
+    background-color: white;
+    color: blue;
+}
+
+@media screen and (min-width: 720px) {
+    .section {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+    }
+    .aside {
+        border-top: 0;
+        border-right: 1px solid blue;
+        grid-column: span 4;
+    }
+    
+    .article {
+        grid-column: span 8;
+    }
+}
