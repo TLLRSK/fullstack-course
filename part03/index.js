@@ -112,6 +112,8 @@ app.get('/info', (req, resp) => {
     `)
 })
 
+app.use(express.static('dist'))
+
 // Middleware after routes, catching invalid endpoints requests
 const unknownEndpoint = (req, resp) => {
     resp.status(404).send({ error: 'unknown endpoint' })
