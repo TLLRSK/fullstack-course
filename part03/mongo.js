@@ -12,10 +12,7 @@ const url = `mongodb+srv://pjUser:${password}@cluster0.tlo03.mongodb.net/phonebo
 mongoose.set("strictQuery", false);
 
 mongoose.connect(url);
-/*
-First, we define the schema of a note that is stored in the noteSchema variable.
-The schema tells Mongoose how the note objects are to be stored in the database.
-*/
+
 const personSchema = new mongoose.Schema({
   name: String,
   number: String,
@@ -40,15 +37,3 @@ process.argv.length > 3
     })
     mongoose.connection.close();
   });
-
-// note.save().then(result => {
-//   console.log('note saved!')
-//   mongoose.connection.close()
-// })
-
-// Note.find({}).then((result) => {
-//   result.forEach((note) => {
-//     console.log(note);
-//   });
-//   mongoose.connection.close();
-// });
