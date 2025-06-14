@@ -1,6 +1,5 @@
 const express = require('express');
 const morgan = require('morgan');
-const cors = require('cors');
 const app = express();
 
 let persons = [
@@ -36,7 +35,6 @@ const reqLogger = (req, resp, next) => {
 }
 
 app.use(express.json()) // Activating express' json parser
-app.use(cors());
 app.use(express.static('dist'));
 morgan.token('body', function getPerson(req) {
     const {id, ...filteredBody} = req.body

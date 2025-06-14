@@ -1,1 +1,1 @@
-https://fllstck-crs-open-pj.fly.dev/
+https://fullstack-course-ghhc.onrender.com/
