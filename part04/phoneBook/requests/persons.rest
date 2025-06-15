@@ -1,0 +1,21 @@
+GET http://localhost:3001/api/persons/684db910e0e15dde8c8e77a4
+###
+GET http://localhost:3001/api/persons/
+###
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "Ju",
+    "number": "014-0000088"
+}
+###
+DELETE http://localhost:3001/api/persons/684dbd4de0e15dde8c8e77b0
+###
+PUT http://localhost:3001/api/persons/684db4f6e020ec442763304b
+Content-Type: application/json
+
+{
+    "name": "Pepe",
+    "number": "014-0000098"
+}

@@ -5,7 +5,6 @@ import PersonForm from './components/form/PersonForm'
 import Persons from './components/persons/Persons'
 import personService from './services/persons'
 import Notification from './components/notification/Notification'
-import axios from 'axios'
 
 const App = () => {
   const [persons, setPersons] = useState([])
