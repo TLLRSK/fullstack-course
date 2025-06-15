@@ -1,99 +1,137 @@
 require('dotenv').config()
-const express = require("express");
-const morgan = require("morgan");
-const app = express();
-const Person = require("./models/person");
+const express = require('express')
+const morgan = require('morgan')
+const app = express()
+const Person = require('./models/person')
 
 // MIDDLEWARE
 const reqLogger = (req, resp, next) => {
-  console.log("Method:", req.method);
-  console.log("Path:  ", req.path);
-  console.log("Body:  ", req.body);
-  console.log("---");
-  next(); // Yields control to the next middleware
-};
+  console.log('Method:', req.method)
+  console.log('Path:  ', req.path)
+  console.log('Body:  ', req.body)
+  console.log('---')
+  next()
+}
 
-app.use(express.json()); // Activating express' json parser
-app.use(express.static("dist"));
-morgan.token("body", function getPerson(req) {
-  const { id, ...filteredBody } = req.body;
-  return JSON.stringify(filteredBody);
-});
-app.use(morgan(":method :url :response-time :body"));
+const errorHandler = (error, req, resp, next) => {
+  console.error(error.message)
 
-// UTILS
-const generateId = () => {
-  const maxId =
-    notes.length > 0
-      ? Math.max(...notes.map((n) => Number(n.id))) // getting the highest id Number in notes arr
-      : 0;
-  return String(maxId + 1); // turning id into String
-};
+  if (error.name === 'CastError') {
+    return resp.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return resp.status(400).json({ error: error.message })
+  }
+
+  next(error)
+}
+
+app.use(express.static('dist'))
+app.use(express.json())
+app.use(reqLogger)
+
+morgan.token('body', function getPerson(req) {
+  const { ...filteredBody } = req.body
+  return JSON.stringify(filteredBody)
+})
+app.use(morgan(':method :url :response-time :body'))
 
 /* ROUTES */
-/**  PERSONS **/
-const generatePersonId = () => {
-  return String(Math.floor(Math.random() * 1000));
-};
-app.get("/api/persons", (req, resp) => {
-  Person.find({}).then(people => {
-    resp.json(people);
+
+app.get('/api/persons', (req, resp) => {
+  Person.find({}).then((people) => {
+    resp.json(people)
   })
-});
-app.get("/api/persons/:id", (req, resp) => {
-  const id = req.params.id;
-  const person = persons.find((p) => p.id === id);
-  if (person) {
-    resp.json(person);
-  } else {
-    resp.status(404).end();
-  }
-});
-app.post("/api/persons", (req, resp) => {
-  // 1. Person data is the req body
-  const person = req.body;
-  // 2. Checks if req's body has content
-  if (!req.body.name) {
-    return resp.status(400).json({ error: "introduce a name" });
-  }
-  if (!req.body.number) {
-    return resp.status(400).json({ error: "introduce a number" });
-  }
-  // 3. Checks if name exists previously
-  if (persons.find((p) => p.name === req.body.name)) {
-    return resp.status(400).json({ error: "name must be unique" });
-  }
-  // 3. Assigning id to person
-  person.id = generatePersonId();
-  // 3. Create a new persons array with the new person
-  persons = persons.concat(person);
-  // 4. Reponses the client with a JSON
-  resp.json(person);
-});
-app.delete("/api/persons/:id", (req, resp) => {
-  const id = req.params.id;
-  persons = persons.filter((p) => p.id !== id);
-  console.log("deleting person: ", id);
-  resp.status(204).end();
-});
+})
 
-app.get("/info", (req, resp) => {
-  const entries = persons.length;
-  const date = new Date();
-  resp.send(`
-        <p>Phonebook has info for ${entries} people</p>
+app.get('/api/persons/:id', (req, resp, next) => {
+  const id = req.params.id
+  Person.findById(id)
+    .then((person) => {
+      if (person) {
+        resp.json(person)
+      } else {
+        resp.status(404).end()
+      }
+    })
+    .catch((error) => next(error))
+})
+
+app.post('/api/persons', (req, res, next) => {
+  const body = req.body
+
+  if (!body.name) {
+    return res.status(400).json({ error: 'name is required' })
+  }
+  if (!body.number) {
+    return res.status(400).json({ error: 'number is required' })
+  }
+
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  })
+
+  person
+    .save()
+    .then((savedPerson) => {
+      res.json(savedPerson)
+    })
+    .catch((error) => next(error))
+})
+
+app.delete('/api/persons/:id', (req, res, next) => {
+  const id = req.params.id
+  Person.findByIdAndDelete(id)
+    .then((result) => {
+      if (!result) {
+        return res.status(404).end()
+      }
+      console.log('Deleted person:', id)
+      res.status(204).end()
+    })
+    .catch((error) => next(error))
+})
+
+app.put('/api/persons/:id', (req, resp, next) => {
+  const { name, number } = req.body
+
+  Person.findById(req.params.id)
+    .then((person) => {
+      if (!person) {
+        return resp.status(404).end()
+      }
+
+      person.name = name
+      person.number = number
+
+      return person.save().then((updatedPerson) => {
+        resp.json(updatedPerson)
+      })
+    })
+    .catch((error) => next(error))
+})
+
+app.get('/info', (req, res, next) => {
+  Person.countDocuments({})
+    .then((count) => {
+      const date = new Date()
+      res.send(`
+        <p>Phonebook has info for ${count} people</p>
         <p>${date}</p>
-    `);
-});
-
-app.use(express.static("dist"));
+      `)
+    })
+    .catch((error) => next(error))
+})
 
 // Middleware after routes, catching invalid endpoints requests
 const unknownEndpoint = (req, resp) => {
-  resp.status(404).send({ error: "unknown endpoint" });
-};
+  resp.status(404).send({ error: 'unknown endpoint' })
+}
 
-const PORT = process.env.PORT || 3001;
+app.use(unknownEndpoint)
+app.use(errorHandler)
+
+const PORT = process.env.PORT
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+  console.log(`Server running on port ${PORT}`)
+})
